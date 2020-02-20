@@ -16,6 +16,8 @@ The `statistics` sensor platform consumes the state from other sensors. It expor
 If you are running the [recorder](/integrations/recorder/) component, on startup the data is read from the database. So after a restart of the platform, you will immediately have data available. If you're using the [history](/integrations/history/) component, this will automatically also start the `recorder` integration on startup.
 If you are *not* running the `recorder` component, it can take time till the sensor starts to work because a couple of attributes need more than one value to do the calculation.
 
+The sensor updates itself each time the original sensor changes. To force a uniform update interval, set the desired `scan_interval` period in the config. 
+
 ## Configuration
 
 To enable the statistics sensor, add the following lines to your `configuration.yaml`:
@@ -32,6 +34,13 @@ sensor:
     entity_id: binary_sensor.movement
     max_age:
       minutes: 30
+  - platform: statistics
+    entity_id: sensor.high_freq_temperature_samples
+    name: 5min rolling mean for temperature updated minutely
+    max_age:
+      minutes: 5
+    scan_interval:
+      seconds: 60
 ```
 
 {% configuration %}
@@ -51,6 +60,10 @@ sampling_size:
   type: integer
 max_age:
   description: Maximum age of measurements. Setting this to a time interval will cause older values to be discarded.
+  required: false
+  type: time
+scan_interval:
+  description: Set for a fixed interval for state changes. All samples are processed, but the sensor only updates at specific times. If undefined (by default), each incoming sample generates a new state change event.  
   required: false
   type: time
 precision:
